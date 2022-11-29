@@ -71,9 +71,9 @@
                 <form action="#" th:action="@{/registration}" th:object="${user}" method="post">
 
                     <div class="mx-5 px-5 form-group form-group-lg">
-                        <label for="username" class="h4">Your Username</label>
+                        <label for="username" class="h4">Your E-Mail</label>
                         <input type="text" id="username" class="form-control input-lg" th:field="*{username}"
-                               placeholder="Enter New Username"/>
+                               placeholder="Enter New E-Mail"/>
                         <label for="username" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
                                style="color: red"></label>
                     </div>
@@ -87,7 +87,8 @@
                         <img onclick="showPassword(0)" alt="lock?" class="d-block" src="../static/icons/unlock.png"
                              th:src="@{/icons/unlock.png}"
                              style="width: 30px; position: absolute; left: calc(100% - 15px); top: 40px">
-                        <img id="img1" onclick="showPassword(0)" alt="lock?" class="d-block" src="../static/icons/lock.png"
+                        <img id="img1" onclick="showPassword(0)" alt="lock?" class="d-block"
+                             src="../static/icons/lock.png"
                              th:src="@{/icons/lock.png}"
                              style="width: 30px; position: absolute; left: calc(100% - 15px); top: 40px; visibility: hidden;">
                     </div>
@@ -96,12 +97,14 @@
                         <label for="repeat" class="h4">Repeat your password</label>
                         <input type="password" id="repeat" class="form-control" th:field="*{repeatedPassword}"
                                placeholder="Repeat Your Password"/>
-                        <label for="password" th:if="${#fields.hasErrors('repeatedPassword')}" th:errors="*{repeatedPassword}"
+                        <label for="password" th:if="${#fields.hasErrors('repeatedPassword')}"
+                               th:errors="*{repeatedPassword}"
                                style="color: red"></label>
                         <img onclick="showPassword(1)" alt="lock?" class="d-block" src="../static/icons/unlock.png"
                              th:src="@{/icons/unlock.png}"
                              style="width: 30px; position: absolute; left: calc(100% - 15px); top: 40px">
-                        <img id="img2" onclick="showPassword(1)" alt="lock?" class="d-block" src="../static/icons/lock.png"
+                        <img id="img2" onclick="showPassword(1)" alt="lock?" class="d-block"
+                             src="../static/icons/lock.png"
                              th:src="@{/icons/lock.png}"
                              style="width: 30px; position: absolute; left: calc(100% - 15px); top: 40px; visibility: hidden;">
                     </div>
@@ -109,7 +112,7 @@
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="surname" class="h4">Your Surname</label>
                         <input type="text" id="surname" class="form-control input-lg" th:field="*{surname}"
-                               placeholder="Enter New Username"/>
+                               placeholder="Enter New Surname"/>
                         <label for="surname" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"
                                style="color: red"></label>
                     </div>
@@ -117,7 +120,7 @@
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="name" class="h4">Your Name</label>
                         <input type="text" id="name" class="form-control input-lg" th:field="*{name}"
-                               placeholder="Enter New Username"/>
+                               placeholder="Enter New Name"/>
                         <label for="name" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
                                style="color: red"></label>
                     </div>
@@ -125,7 +128,7 @@
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="patronymic" class="h4">Your Patronymic (or Empty)</label>
                         <input type="text" id="patronymic" class="form-control input-lg" th:field="*{patronymic}"
-                               placeholder="Enter New Username"/>
+                               placeholder="Enter New Patronymic"/>
                         <label for="patronymic" th:if="${#fields.hasErrors('patronymic')}" th:errors="*{patronymic}"
                                style="color: red"></label>
                     </div>

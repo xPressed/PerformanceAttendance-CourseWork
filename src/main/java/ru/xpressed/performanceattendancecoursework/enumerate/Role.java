@@ -10,7 +10,9 @@ import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Enumerated list of Roles for Users.
+ *
  * @see ru.xpressed.performanceattendancecoursework.entity.User
+ * @see ru.xpressed.performanceattendancecoursework.controller.UsersController
  */
 public enum Role implements GrantedAuthority {
     ROLE_DEFAULT, ROLE_STUDENT, ROLE_TEACHER, ROLE_ADMIN;

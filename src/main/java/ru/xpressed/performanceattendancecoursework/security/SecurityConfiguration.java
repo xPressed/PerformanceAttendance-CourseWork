@@ -15,14 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Security Configuration class with some settings.
+ * Security Configuration class with some settings and password encoder.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    /**
-     * Filter Chain bean to configure HTTP.
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -52,10 +49,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    /**
-     * Password Encoder bean to encrypt and decrypt passwords stored in database.
-     * @return password encoder
-     */
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();

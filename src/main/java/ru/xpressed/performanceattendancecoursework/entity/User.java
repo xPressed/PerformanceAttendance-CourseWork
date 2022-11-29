@@ -14,12 +14,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+/**
+ * Entity to store user data.
+ *
+ * @see ru.xpressed.performanceattendancecoursework.repository.UserRepository
+ * @see ru.xpressed.performanceattendancecoursework.controller.UsersController
+ * @see Role
+ * @see Attendance
+ * @see Discipline
+ * @see ru.xpressed.performanceattendancecoursework.security.SecurityUserDetailsService
+ */
 @Entity
 @Getter
 @Setter
@@ -29,39 +40,23 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class User implements UserDetails {
-    /**
-     * ID of any user in database and application.
-     */
     @Id
-    @Size(min = 3, message = "Username must be at least 3 symbols!")
-    @Size(max = 10, message = "Username must be less than 10 symbols!")
-    @Pattern(regexp = "^[a-zA-Z0-9]*", message = "Username must contain only letters an numbers!")
+    @Email(regexp = "^[a-zA-Z\\.\\-\\_]*[@][a-zA-Z]*[\\.].[a-zA-Z]*", message = "E-Mail must be valid!")
+    @Size(max = 40, message = "E-Mail must be less than 40 symbols!")
     @NonNull
     private String username;
 
-    /**
-     * Password of any user in database stored encrypted.
-     */
     @NonNull
     private String password;
 
-    /**
-     * Repeated Password field is not stored.
-     * Is used to confirm password during registration.
-     */
     @Transient
     private String repeatedPassword;
 
-    /**
-     * List of Roles appended to user.
-     *
-     * @see Role
-     */
     @ElementCollection(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_username")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NonNull
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     @NonNull
     @Size(min = 1, message = "Surname must not be empty!")
@@ -76,12 +71,21 @@ public class User implements UserDetails {
     private String name;
 
     @NonNull
-    @Size(max = 20, message = "Patronymic must be less tan 15 symbols!")
+    @Size(max = 20, message = "Patronymic must be less than 15 symbols!")
     @Pattern(regexp = "^[a-zA-Zа-яА-Я]*", message = "Patronymic must contain only letters!")
     private String patronymic;
 
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я0-9]*", message = "Group must contain only letters and numbers!")
+    @Size(max = 10, message = "Group Name must be less than 15 symbols!")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я0-9\\-]*", message = "Group must contain only letters and numbers!")
     private String groupName;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Discipline> disciplines;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Attendance> attendances;
+
+    private String token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

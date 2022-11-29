@@ -18,6 +18,7 @@ import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
  * Security Service to get users from database when authentication needed.
  *
  * @see UserRepository
+ * @see User
  */
 @Service
 public class SecurityUserDetailsService implements UserDetailsService {

@@ -27,7 +27,9 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
     @ExceptionHandler(Exception.class)
     public String showErrorPage(HttpServletRequest request, Model model) {
         Object obj = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        //Check if request was forced and no error caught
         if (obj != null) {
+            //Custom error page build for 403 error
             if (obj.equals(403)) {
                 model.addAttribute("code", "Status code: " + obj + " Access denied!");
             } else {

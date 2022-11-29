@@ -23,18 +23,13 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.13.1/datatables.min.js"></script>
-
     <meta charset="UTF-8">
-    <title>Users</title>
+    <title>Performance</title>
     <link rel="icon" th:href="@{/icons/leaf.png}" href="../../static/icons/leaf.png">
 
-    <script>
-        function closeIFrame(href) {
-            if (href) {
-                window.location = href;
-            } else {
-                window.location = "/users";
-            }
+    <script th:inline="javascript">
+        function closeIFrame() {
+            window.location = "/performance?username=" + [[${owner}]];
         }
 
         $(document).ready(function () {
@@ -46,22 +41,22 @@
             display: none;
         }
 
-        #current {
+        #current, .first {
             background-color: white;
             color: #5700f7;
         }
 
-        #current:hover {
+        #current:hover, .first:hover {
             background-color: #5700f7;
             color: white;
         }
 
-        #btn {
+        #btn, #second {
             background-color: white;
             color: grey;
         }
 
-        #btn:hover {
+        #btn:hover, #second:hover {
             background-color: grey;
             color: white;
         }
@@ -76,13 +71,12 @@
             <nav class="navbar sticky-top navbar-expand-xl navbar-light"
                  style="background-color: white; border-bottom: 2px solid #d9d9d9">
 
-                <a href="/users">
+                <a href="/">
                     <img alt="leaf?" class="d-block ml-5 mr-2" src="../../static/icons/leaf.png"
                          th:src="@{/icons/leaf.png}"
                          style="width: 75px">
                 </a>
-                <a class="h2 pt-3" href="/users"
-                   style="color: black; text-decoration: none; font-family: Mechfire,serif">Spring
+                <a class="h2 pt-3" href="/" style="color: black; text-decoration: none; font-family: Mechfire,serif">Spring
                     Table</a>
                 <button aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"
                         class="navbar-toggler" data-target="#navbarNavDropdown" data-toggle="collapse"
@@ -93,8 +87,9 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item active">
                             <a id="current" class="nav-link h4 px-4 mt-3"
-                               href="/users"
-                               style="border: 2px solid #5700f7; border-radius: 30px">Users</a>
+                               th:href="${navHref}"
+                               th:text="${navText}"
+                               style="border: 2px solid #5700f7; border-radius: 30px">Table</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a aria-expanded="false" aria-haspopup="true"
@@ -104,9 +99,8 @@
                             <div aria-labelledby="navbarDropdownMenuLink"
                                  class="dropdown-menu dropdown-menu-right p-1"
                                  style="margin-top: 9px; border: 2px solid #d9d9d9; border-top: 2px solid white; border-radius: 0 0 10px 10px;">
-                                <a id="btn" class="dropdown-item"
-                                   style="border: 1px solid grey; border-radius: 25px"
-                                   href="/logout">Log Out</a>
+                                <a id="btn" class="dropdown-item" href="/logout"
+                                   style="border: 1px solid grey; border-radius: 25px">Log Out</a>
                             </div>
                         </li>
                     </ul>
@@ -114,56 +108,67 @@
             </nav>
 
 
+            <div class="d-flex justify-content-center m-3 pb-3">
+                <button type="button" class="first btn btn-secondary btn-lg"
+                        th:attr="onclick=|location.href='/performance?username=${owner}'|"
+                        style="border-color: #5700f7; border-radius: 30px">
+                    Performance
+                </button>
+                <button id="second" type="button" th:attr="onclick=|location.href='/attendance?username=${owner}'|"
+                        class="btn btn-secondary btn-lg pb-3 mx-4"
+                        style="border-color: grey; border-radius: 30px">Attendance
+                </button>
+            </div>
+
             <div class="row justify-content-center text-center">
                 <div class="col-11">
-                    <p class="h1 my-4">Users Table</p>
+                    <p class="h1 my-4">Performance Table</p>
+                    <button type="button" class="first btn btn-secondary btn-lg"
+                            th:if="${actions}"
+                            th:attr="onclick=|location.href='/performance?username=${owner}&add=${owner}'|"
+                            style="border-color: #5700f7; border-radius: 30px">
+                        Add Performance Record
+                    </button>
                     <table id="userstable" class="table table-striped table-bordered table-sm m-0 p-0">
                         <thead>
                         <tr>
-                            <th class="col-2">Role</th>
-                            <th class="col-2">Surname</th>
-                            <th class="col-2">Name</th>
-                            <th class="col-2">Patronymic</th>
-                            <th class="col-2">Group</th>
-                            <th style="min-width: 130px; max-width: 130px">Actions</th>
+                            <th class="col-5">Name</th>
+                            <th class="col-1">Mark</th>
+                            <th class="col-1">Year</th>
+                            <th style="min-width: 80px; max-width: 80px" th:if="${actions}">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="row : ${rows}">
-                            <td th:text="${row.roles}"
-                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
-                            <td th:text="${row.surname}"
-                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
                             <td th:text="${row.name}"
-                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
-                            <td th:text="${row.patronymic}"
-                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
-                            <td th:text="${row.groupName}"
                                 style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
-                            <td>
-                                <button type="button" class="btn btn-primary"
-                                        th:attr="onclick=|location.href='/users?view=${row.username}'|"><i
-                                        class="fa fa-eye"></i></button>
+                            <td th:text="${row.mark}"
+                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
+                            <td th:text="${row.year}"
+                                style="text-overflow: ellipsis; overflow: hidden; max-width: 0"></td>
+                            <td th:if="${actions}">
                                 <button type="button" class="btn btn-success"
-                                        th:attr="onclick=|location.href='/users?update=${row.username}'|"><i
-                                        class="fa fa-edit"></i></button>
-                                <button type="button" class="btn btn-danger" th:if="${delete}"
-                                        th:attr="onclick=|location.href='/users/delete?username=${row.username}'|"><i
-                                        class="fas fa-trash-alt"></i></button>
+                                        th:attr="onclick=|location.href='/performance?username=${owner}&update=${row.id}'|">
+                                    <i
+                                            class="fa fa-edit"></i></button>
+                                <button type="button" class="btn btn-danger"
+                                        th:attr="onclick=|location.href='/performance?username=${owner}&delete=${row.id}'|">
+                                    <i
+                                            class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </div>
     </div>
-
 </div>
 
-<iframe th:if="${param.update}" th:attr="src=|@{/users/update(username=${param.update[0]})}|"
+<iframe th:if="${param.add}" th:attr="src=|@{/performance/add(username=${param.add[0]})}|"
         style="width: 100%; height: 100%; position: absolute; left:0; top:0; border: none"></iframe>
-<iframe th:if="${param.view}" th:attr="src=|@{/users/view(username=${param.view[0]})}|"
+<iframe th:if="${param.update}" th:attr="src=|@{/performance/update(id=${param.update[0]})}|"
         style="width: 100%; height: 100%; position: absolute; left:0; top:0; border: none"></iframe>
 
 </body>

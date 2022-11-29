@@ -11,7 +11,7 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://fonts.cdnfonts.com/css/mechfire" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>Authorization</title>
+    <title>Update</title>
     <link rel="icon" th:href="@{/icons/leaf.png}" href="../../static/icons/leaf.png">
 
     <style>
@@ -40,32 +40,73 @@
             <div style="background-color: white; border-radius: 25px; border: 2px solid #5700f7">
                 <p class="text-center display-4" style="font-family: Mechfire,serif">Spring Table</p>
 
-                <form action="#" th:action="@{/users/update(username=${param.username[0]})}" th:object="${user}" method="post">
+                <form action="#" th:action="@{/users/update(username=${param.username[0]})}" th:object="${user}"
+                      method="post">
+                    <div class="mx-5 px-5 form-group form-group-lg">
+                        <div th:if="${roleUpdate}">
+                            <label class="h4">Role</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="default" th:field="*{roles}"
+                                       value="ROLE_DEFAULT">
+                                <label class="form-check-label" for="default">
+                                    ROLE_DEFAULT
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="student" th:field="*{roles}"
+                                       value="ROLE_STUDENT">
+                                <label class="form-check-label" for="student">
+                                    ROLE_STUDENT
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="teacher" th:field="*{roles}"
+                                       value="ROLE_TEACHER">
+                                <label class="form-check-label" for="teacher">
+                                    ROLE_TEACHER
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="admin" th:field="*{roles}"
+                                       value="ROLE_ADMIN">
+                                <label class="form-check-label" for="admin">
+                                    ROLE_ADMIN
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="surname" class="h4">Surname</label>
-                        <input type="text" id="surname" class="form-control input-lg" th:field="*{surname}"/>
+                        <input type="text" id="surname" class="form-control input-lg" th:field="*{surname}"
+                               placeholder="Enter Surname"/>
                         <label for="surname" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"
                                style="color: red"></label>
                     </div>
 
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="name" class="h4">Name</label>
-                        <input type="text" id="name" class="form-control input-lg" th:field="*{name}"/>
+                        <input type="text" id="name" class="form-control input-lg" th:field="*{name}"
+                               placeholder="Enter Name"/>
                         <label for="name" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
                                style="color: red"></label>
                     </div>
 
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="patronymic" class="h4">Patronymic (or Empty)</label>
-                        <input type="text" id="patronymic" class="form-control input-lg" th:field="*{patronymic}"/>
+                        <input type="text" id="patronymic" class="form-control input-lg" th:field="*{patronymic}"
+                               placeholder="Enter Patronymic"/>
                         <label for="patronymic" th:if="${#fields.hasErrors('patronymic')}" th:errors="*{patronymic}"
                                style="color: red"></label>
                     </div>
 
                     <div class="mx-5 px-5 form-group form-group-lg">
                         <label for="groupName" class="h4">Group Name</label>
-                        <input type="text" id="groupName" class="form-control input-lg" th:field="*{groupName}"/>
+                        <input type="text" id="groupName" class="form-control input-lg" th:field="*{groupName}"
+                               placeholder="Enter Group Name"/>
                         <label for="groupName" th:if="${#fields.hasErrors('groupName')}" th:errors="*{groupName}"
                                style="color: red"></label>
                     </div>

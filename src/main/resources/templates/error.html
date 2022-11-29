@@ -16,6 +16,16 @@
         ::-webkit-scrollbar {
             display: none;
         }
+
+        #btn {
+            background-color: white;
+            color: #5700f7;
+        }
+
+        #btn:hover {
+            background-color: #5700f7;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -26,8 +36,8 @@
                 <p class="text-center display-4 pb-3" style="color: black">Something went wrong :(</p>
                 <p class="text-center display-4 pb-3" th:text="${code}" style="color: black">Status Code: 404</p>
                 <div class="d-flex justify-content-center m-3 pb-3">
-                    <button class="btn btn-secondary btn-lg pb-3" onclick="location.href='/'"
-                            style="background-color: #5700f7; border-color: white; border-radius: 30px"
+                    <button id="btn" class="btn btn-secondary btn-lg pb-3" onclick="location.href='/'"
+                            style="border-color: #5700f7; border-radius: 30px"
                             type="button">Go Home...
                     </button>
                 </div>

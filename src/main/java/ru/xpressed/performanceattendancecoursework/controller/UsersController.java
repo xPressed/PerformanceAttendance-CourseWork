@@ -21,6 +21,13 @@ import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
 import javax.validation.Valid;
 import java.util.Optional;
 
+/**
+ * UsersController to work with the users table.
+ *
+ * @see UserRepository
+ * @see User
+ * @see Role
+ */
 @Controller
 public class UsersController {
     private UserRepository userRepository;
@@ -30,12 +37,21 @@ public class UsersController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Mapping for GET REQUEST to show users table and apply overflow and blur on view or update.
+     *
+     * @param authentication to get current autenticated user's principal
+     * @param model          to interact with templates by Thymeleaf
+     * @param update         to check if update page is opened
+     * @param view           to check if view page is opened
+     * @return the template of page
+     */
     @GetMapping("/users")
-    public String showUsersPage(Authentication authentication, Model model,
-                                @RequestParam("update") Optional<String> update) {
+    public String showUsersPage(Authentication authentication, Model model, @RequestParam("update") Optional<String> update, @RequestParam("view") Optional<String> view) {
+        //Template building
         model.addAttribute("username", authentication.getName());
 
-        if (update.isPresent()) {
+        if (update.isPresent() || view.isPresent()) {
             model.addAttribute("overflow", "hidden");
             model.addAttribute("blur", "5px");
         } else {
@@ -44,38 +60,88 @@ public class UsersController {
         }
 
         if (authentication.getAuthorities().contains(Role.ROLE_TEACHER)) {
-            model.addAttribute("update", true);
             model.addAttribute("delete", false);
         } else {
-            model.addAttribute("update", true);
             model.addAttribute("delete", true);
         }
 
+        //Table data
         model.addAttribute("rows", userRepository.findAll());
         return "users/main";
     }
 
+    /**
+     * Mapping for GET REQUEST to update user's data.
+     *
+     * @param username       to choose the user
+     * @param authentication to check for admin role
+     * @param model          to show update buttons for admins only
+     * @return the template of page
+     */
     @GetMapping("/users/update")
     public String getUpdateUser(@RequestParam("username") String username, Authentication authentication, Model model) {
-        if (authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            model.addAttribute("user", userRepository.findById(username));
-            return "users/update";
+        if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+            model.addAttribute("roleUpdate", true);
+        } else {
+            model.addAttribute("roleUpdate", false);
         }
-        return "redirect:/users";
+
+        User user = userRepository.findById(username).orElse(null);
+        assert user != null;
+        model.addAttribute("user", user);
+        return "users/update";
     }
 
+    /**
+     * Method for POST REQUEST to update user's data.
+     *
+     * @param username       to choose the user
+     * @param newUser        to get new data
+     * @param bindingResult  to validate new data
+     * @param model          to return errors
+     * @param authentication to check for admin role
+     * @return the template page
+     */
     @PostMapping("/users/update")
-    public String postUpdateUser(@RequestParam("username") String username, @Valid User newUser, BindingResult bindingResult, Model model) {
+    public String postUpdateUser(@RequestParam("username") String username, @Valid User newUser,
+                                 BindingResult bindingResult, Model model, Authentication authentication) {
+        if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+            model.addAttribute("roleUpdate", true);
+        } else {
+            model.addAttribute("roleUpdate", false);
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", newUser);
             return "users/update";
         }
+
+        //Update old user with the data of new one
         User oldUser = userRepository.findById(username).orElse(null);
         assert oldUser != null;
-        userRepository.save(oldUser.toBuilder().surname(newUser.getSurname()).name(newUser.getName()).patronymic(newUser.getPatronymic()).groupName(newUser.getGroupName()).build());
+        userRepository.save(oldUser.toBuilder().surname(newUser.getSurname()).name(newUser.getName()).patronymic(newUser.getPatronymic()).groupName(newUser.getGroupName()).roles(newUser.getRoles()).build());
         return "users/update";
     }
 
+    /**
+     * Method for GET REQUEST to check full user's data.
+     *
+     * @param username to choose user
+     * @param model    to show user's full data
+     * @return template of page
+     */
+    @GetMapping("/users/view")
+    public String getViewUser(@RequestParam("username") String username, Model model) {
+        model.addAttribute("user", userRepository.findById(username).orElse(null));
+        return "users/view";
+    }
+
+    /**
+     * Method for GET REQUEST to delete user.
+     *
+     * @param username       to choose user
+     * @param authentication to check for admin rights
+     * @return redirects to users' table
+     */
     @GetMapping("/users/delete")
     public String deleteUser(@RequestParam("username") String username, Authentication authentication) {
         if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
     /**
-     * Controller is showing the authorization page with login form
+     * Controller is showing the authorization page with login form.
      *
      * @return the name of the template
      * @see ru.xpressed.performanceattendancecoursework.security.SecurityConfiguration#filterChain(HttpSecurity)  SecurityConfiguration for settings

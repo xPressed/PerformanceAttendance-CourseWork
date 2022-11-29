@@ -8,14 +8,13 @@ package ru.xpressed.performanceattendancecoursework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.xpressed.performanceattendancecoursework.entity.User;
+import ru.xpressed.performanceattendancecoursework.entity.Attendance;
 
 /**
- * User Repository is the JPA repository to work with database.
+ * Attendance Repository is the JPA repository to work with database.
  *
- * @see User
+ * @see Attendance
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
-    User findByToken(String token);
+public interface AttendanceRepository extends JpaRepository<Attendance, Integer> {
 }
