@@ -7,6 +7,8 @@
 package ru.xpressed.performanceattendancecoursework.entity;
 
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,9 +19,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Entity to store user data.
@@ -56,7 +56,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "user_username")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NonNull
-    private Set<Role> roles = new HashSet<>();
+    private List<Role> roles;
 
     @NonNull
     @Size(min = 1, message = "Surname must not be empty!")
@@ -80,10 +80,12 @@ public class User implements UserDetails {
     private String groupName;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
-    private Set<Discipline> disciplines;
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Discipline> disciplines;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
-    private Set<Attendance> attendances;
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Attendance> attendances;
 
     private String token;
 

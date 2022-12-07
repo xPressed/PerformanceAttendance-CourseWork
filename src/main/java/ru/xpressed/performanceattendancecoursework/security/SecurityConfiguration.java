@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Security Configuration class with some settings and password encoder.
@@ -25,7 +26,17 @@ public class SecurityConfiguration {
         http
                 .authorizeRequests()
                 .antMatchers("/registration", "/error", "/icons/**", "/logout").permitAll()
+
                 .antMatchers("/users").hasAnyRole("TEACHER", "ADMIN")
+                .antMatchers("/users/**").hasAnyRole("TEACHER", "ADMIN")
+                .antMatchers("/users/delete").hasRole("ADMIN")
+
+                .antMatchers("/performance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
+                .antMatchers("/performance/**").hasAnyRole("TEACHER", "ADMIN")
+
+                .antMatchers("/attendance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
+                .antMatchers("/attendance/**").hasAnyRole("TEACHER", "ADMIN")
+
                 .anyRequest().hasAnyRole("STUDENT", "TEACHER", "ADMIN")
 
                 .and()
@@ -39,6 +50,7 @@ public class SecurityConfiguration {
 
                 .and()
                 .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID").permitAll()

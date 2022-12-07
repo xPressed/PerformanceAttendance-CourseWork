@@ -7,6 +7,7 @@
 package ru.xpressed.performanceattendancecoursework.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import ru.xpressed.performanceattendancecoursework.entity.Discipline;
 import ru.xpressed.performanceattendancecoursework.entity.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
@@ -76,12 +78,16 @@ public class PerformanceController {
      * @return the redirect or template
      */
     @GetMapping("/performance")
-    public String showPerformanceTable(Authentication authentication, Model model, @RequestParam("username") String username, @RequestParam("add") Optional<String> add, @RequestParam("update") Optional<String> update, @RequestParam("delete") Optional<Integer> id) {
+    public String showPerformanceTable(Authentication authentication, Model model,
+                                       @RequestParam("username") String username,
+                                       @RequestParam("add") Optional<String> add,
+                                       @RequestParam("update") Optional<String> update,
+                                       @RequestParam("delete") Optional<Integer> id) {
         if (!Objects.equals(username, authentication.getName()) && authentication.getAuthorities().contains(Role.ROLE_STUDENT)) {
             return "redirect:/performance?username=" + authentication.getName();
         }
 
-        //Build tempalte
+        //Build template
         model.addAttribute("username", authentication.getName());
 
         if (authentication.getAuthorities().contains(Role.ROLE_STUDENT)) {
@@ -108,7 +114,9 @@ public class PerformanceController {
             if (id.isPresent()) {
                 //Delete foreign key from discipline
                 Discipline discipline = disciplineRepository.findById(id.orElse(null)).orElse(null);
-                assert discipline != null;
+                if (discipline == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                }
                 discipline.setUser(null);
                 disciplineRepository.save(discipline);
 
@@ -125,18 +133,14 @@ public class PerformanceController {
     /**
      * Method for GET REQUEST to add performance record.
      *
-     * @param authentication to check for permission
      * @param model          to build template
      * @param username       to choose user
      * @return the template or redirect
      */
     @GetMapping("/performance/add")
-    public String getAddPerformanceRecord(Authentication authentication, Model model, @RequestParam("username") String username) {
-        if (authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            model.addAttribute("discipline", new Discipline());
-            return "performance/add";
-        }
-        return "redirect:/performance?username=" + authentication.getName();
+    public String getAddPerformanceRecord(Model model, @RequestParam("username") String username) {
+        model.addAttribute("discipline", new Discipline());
+        return "performance/add";
     }
 
     /**
@@ -146,22 +150,20 @@ public class PerformanceController {
      * @param discipline     data to validate and save
      * @param bindingResult  to validate
      * @param model          to return errors
-     * @param authentication to check for permission
      * @return the template or redirect
      */
     @PostMapping("/performance/add")
-    public String postAddPerformanceRecord(@RequestParam("username") String username, @Valid Discipline discipline, BindingResult bindingResult, Model model, Authentication authentication) {
-        if (!(authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN))) {
-            return "redirect:/performance?username=" + authentication.getName();
-        }
-
+    public String postAddPerformanceRecord(@RequestParam("username") String username, @Valid Discipline discipline,
+                                           BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("discipline", discipline);
             return "performance/add";
         }
 
         User user = userRepository.findById(username).orElse(null);
-        assert user != null;
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         discipline.setUser(user);
         user.getDisciplines().add(discipline);
         userRepository.save(user);
@@ -173,17 +175,16 @@ public class PerformanceController {
      *
      * @param id             to choose the record
      * @param model          to build template
-     * @param authentication to check for rights
-     * @return the template or reridrect
+     * @return the template or redirect
      */
     @GetMapping("/performance/update")
-    public String getUpdatePerformanceRecord(@RequestParam("id") Integer id, Model model, Authentication authentication) {
-        if (authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            Discipline discipline = disciplineRepository.findById(id).orElse(null);
-            model.addAttribute("discipline", discipline);
-            return "performance/update";
+    public String getUpdatePerformanceRecord(@RequestParam("id") Integer id, Model model) {
+        Discipline discipline = disciplineRepository.findById(id).orElse(null);
+        if (discipline == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        return "redirect:/performance?username=" + authentication.getName();
+        model.addAttribute("discipline", discipline);
+        return "performance/update";
     }
 
     /**
@@ -193,22 +194,19 @@ public class PerformanceController {
      * @param newDiscipline  new updated data
      * @param bindingResult  to validate
      * @param model          to return errors
-     * @param authentication to check for rights
      * @return the template or redirect
      */
     @PostMapping("/performance/update")
-    public String postUpdatePerformanceRecord(@RequestParam("id") Integer id, @Valid Discipline newDiscipline, BindingResult bindingResult, Model model, Authentication authentication) {
-        if (!(authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN))) {
-            return "redirect:/performance?username=" + authentication.getName();
-        }
-
+    public String postUpdatePerformanceRecord(@RequestParam("id") Integer id, @Valid Discipline newDiscipline, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("discipline", newDiscipline);
             return "performance/update";
         }
 
         Discipline oldDiscipline = disciplineRepository.findById(id).orElse(null);
-        assert oldDiscipline != null;
+        if (oldDiscipline == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         disciplineRepository.save(oldDiscipline.toBuilder().name(newDiscipline.getName()).mark(newDiscipline.getMark()).year(newDiscipline.getYear()).build());
         return "performance/update";
     }

@@ -22,8 +22,8 @@ import ru.xpressed.performanceattendancecoursework.service.EmailService;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Registration Controller to sign up new users.
@@ -69,8 +69,7 @@ public class RegistrationController {
         //Check for token and update user if token found in database
         if (token.isPresent()) {
             User user = userRepository.findByToken(token.orElse(null));
-            user.setToken(null);
-            user.setRoles(Set.of(Role.ROLE_STUDENT));
+            user.setRoles(List.of(Role.ROLE_STUDENT));
             userRepository.save(user);
             return "redirect:/login";
         }
@@ -90,40 +89,47 @@ public class RegistrationController {
      */
     @PostMapping("/registration")
     public String completeRegistration(@Valid User user, BindingResult bindingResult, Model model) throws MessagingException {
-        boolean flag = false;
+        boolean hasErrors = false;
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);
-            flag = true;
+            hasErrors = true;
         }
 
         //Validate password
         if (user.getPassword().length() < 5) {
             bindingResult.rejectValue("password", "user.password", "Password must be at least 5 symbols!");
-            flag = true;
+            hasErrors = true;
         } else if (user.getPassword().length() > 20) {
             bindingResult.rejectValue("password", "user.password", "Password must be less than 20 symbols!");
-            flag = true;
+            hasErrors = true;
         }
 
         //Validate password confirmation
         if (user.getRepeatedPassword().isEmpty()) {
             bindingResult.rejectValue("repeatedPassword", "user.repeatedPassword", "Repeated password must not be empty!");
-            flag = true;
+            hasErrors = true;
         } else if (!user.getPassword().equals(user.getRepeatedPassword())) {
             bindingResult.rejectValue("repeatedPassword", "user.repeatedPassword", "Passwords do not match!");
-            flag = true;
+            hasErrors = true;
         }
 
-        if (flag) {
+        if (hasErrors) {
             return "registration";
         }
 
         //Check for user absence in database or if user did not verify email
         if (userRepository.findById(user.getUsername()).isEmpty() || userRepository.findById(user.getUsername()).get().getRoles().contains(Role.ROLE_DEFAULT)) {
             user.setPassword(securityConfiguration.encoder().encode(user.getPassword()));
-            user.setRoles(Set.of(Role.ROLE_DEFAULT));
+            user.setRoles(List.of(Role.ROLE_DEFAULT));
 
-            String generated = RandomString.make(32);
+            boolean isGenerated = false;
+            String generated = null;
+            while (!isGenerated) {
+                 generated = RandomString.make(32);
+                if (userRepository.findByToken(generated) == null) {
+                    isGenerated = true;
+                }
+            }
             user.setToken(generated);
 
             //Send verification message

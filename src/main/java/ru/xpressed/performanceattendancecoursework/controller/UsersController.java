@@ -7,6 +7,7 @@
 package ru.xpressed.performanceattendancecoursework.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import ru.xpressed.performanceattendancecoursework.entity.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
 import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
@@ -87,7 +89,9 @@ public class UsersController {
         }
 
         User user = userRepository.findById(username).orElse(null);
-        assert user != null;
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         model.addAttribute("user", user);
         return "users/update";
     }
@@ -117,7 +121,9 @@ public class UsersController {
 
         //Update old user with the data of new one
         User oldUser = userRepository.findById(username).orElse(null);
-        assert oldUser != null;
+        if (oldUser == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         userRepository.save(oldUser.toBuilder().surname(newUser.getSurname()).name(newUser.getName()).patronymic(newUser.getPatronymic()).groupName(newUser.getGroupName()).roles(newUser.getRoles()).build());
         return "users/update";
     }
@@ -131,7 +137,11 @@ public class UsersController {
      */
     @GetMapping("/users/view")
     public String getViewUser(@RequestParam("username") String username, Model model) {
-        model.addAttribute("user", userRepository.findById(username).orElse(null));
+        User user =  userRepository.findById(username).orElse(null);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        model.addAttribute("user", user);
         return "users/view";
     }
 
@@ -139,14 +149,11 @@ public class UsersController {
      * Method for GET REQUEST to delete user.
      *
      * @param username       to choose user
-     * @param authentication to check for admin rights
      * @return redirects to users' table
      */
     @GetMapping("/users/delete")
-    public String deleteUser(@RequestParam("username") String username, Authentication authentication) {
-        if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            userRepository.deleteById(username);
-        }
+    public String deleteUser(@RequestParam("username") String username) {
+        userRepository.deleteById(username);
         return "redirect:/users";
     }
 }

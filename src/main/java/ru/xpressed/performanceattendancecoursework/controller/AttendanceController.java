@@ -7,6 +7,7 @@
 package ru.xpressed.performanceattendancecoursework.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import ru.xpressed.performanceattendancecoursework.entity.Attendance;
 import ru.xpressed.performanceattendancecoursework.entity.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
@@ -96,7 +98,9 @@ public class AttendanceController {
             //Check and deletion of attendance
             if (id.isPresent()) {
                 Attendance attendance = attendanceRepository.findById(id.orElse(null)).orElse(null);
-                assert attendance != null;
+                if (attendance == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                }
                 attendance.setUser(null);
                 attendanceRepository.save(attendance);
 
@@ -112,18 +116,14 @@ public class AttendanceController {
     /**
      * Method for GET REQUEST to add attendance record.
      *
-     * @param authentication check for permission
      * @param model          to build template
      * @param username       to choose user
      * @return the template or redirect
      */
     @GetMapping("/attendance/add")
-    public String getAddAttendanceRecord(Authentication authentication, Model model, @RequestParam("username") String username) {
-        if (authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            model.addAttribute("attendance", new Attendance());
-            return "attendance/add";
-        }
-        return "redirect:/attendance?username=" + authentication.getName();
+    public String getAddAttendanceRecord(Model model, @RequestParam("username") String username) {
+        model.addAttribute("attendance", new Attendance());
+        return "attendance/add";
     }
 
     /**
@@ -133,17 +133,12 @@ public class AttendanceController {
      * @param attendance     data to validate and save
      * @param bindingResult  to validate
      * @param model          to return errors
-     * @param authentication to check for permission
      * @return the redirect or template
      */
     @PostMapping("/attendance/add")
     public String postAddAttendanceRecord(@RequestParam("username") String username,
                                           @Valid Attendance attendance,
-                                          BindingResult bindingResult, Model model, Authentication authentication) {
-        if (!(authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN))) {
-            return "redirect:/attendance?username=" + authentication.getName();
-        }
-
+                                          BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("attendance", attendance);
             return "attendance/add";
@@ -165,17 +160,16 @@ public class AttendanceController {
      *
      * @param id             to choose the record
      * @param model          to build template
-     * @param authentication to check for permissions
      * @return the redirect or template
      */
     @GetMapping("/attendance/update")
-    public String getUpdateAttendanceRecord(@RequestParam("id") Integer id, Model model, Authentication authentication) {
-        if (authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            Attendance attendance = attendanceRepository.findById(id).orElse(null);
-            model.addAttribute("attendance", attendance);
-            return "attendance/update";
+    public String getUpdateAttendanceRecord(@RequestParam("id") Integer id, Model model) {
+        Attendance attendance = attendanceRepository.findById(id).orElse(null);
+        if (attendance == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        return "redirect:/attendance?username=" + authentication.getName();
+        model.addAttribute("attendance", attendance);
+        return "attendance/update";
     }
 
     /**
@@ -185,16 +179,11 @@ public class AttendanceController {
      * @param newAttendance  new data of record
      * @param bindingResult  to check for errors
      * @param model          to build template and return errors
-     * @param authentication to check for permissions
      * @return the redirect or template
      */
     @PostMapping("/attendance/update")
     public String postUpdateAttendanceRecord(@RequestParam("id") Integer id, @Valid Attendance newAttendance,
-                                             BindingResult bindingResult, Model model, Authentication authentication) {
-        if (!(authentication.getAuthorities().contains(Role.ROLE_TEACHER) || authentication.getAuthorities().contains(Role.ROLE_ADMIN))) {
-            return "redirect:/attendance?username=" + authentication.getName();
-        }
-
+                                             BindingResult bindingResult, Model model) {
         //Check for validation errors
         if (bindingResult.hasErrors()) {
             model.addAttribute("attendance", newAttendance);
@@ -203,7 +192,9 @@ public class AttendanceController {
 
         //Build attendance with new data from new
         Attendance oldAttendance = attendanceRepository.findById(id).orElse(null);
-        assert oldAttendance != null;
+        if (oldAttendance == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         attendanceRepository.save(oldAttendance.toBuilder().date(newAttendance.getDate()).enterTime(newAttendance.getEnterTime()).exitTime(newAttendance.getExitTime()).build());
         return "attendance/update";
     }
