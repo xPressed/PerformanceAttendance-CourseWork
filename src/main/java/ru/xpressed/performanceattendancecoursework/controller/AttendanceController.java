@@ -145,7 +145,9 @@ public class AttendanceController {
         }
 
         User user = userRepository.findById(username).orElse(null);
-        assert user != null;
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         attendance.setUser(user);
 
         //Add new attendance record to user
