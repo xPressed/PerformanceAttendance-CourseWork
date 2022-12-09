@@ -51,12 +51,22 @@
             color: white;
         }
 
-        #btn, #second {
+        #btn1 {
+            background-color: white;
+            color: #5700f7;
+        }
+
+        #btn1:hover {
+            background-color: #5700f7;
+            color: white;
+        }
+
+        #btn2, #second {
             background-color: white;
             color: grey;
         }
 
-        #btn:hover, #second:hover {
+        #btn2:hover, #second:hover {
             background-color: grey;
             color: white;
         }
@@ -99,8 +109,12 @@
                             <div aria-labelledby="navbarDropdownMenuLink"
                                  class="dropdown-menu dropdown-menu-right p-1"
                                  style="margin-top: 9px; border: 2px solid #d9d9d9; border-top: 2px solid white; border-radius: 0 0 10px 10px;">
-                                <a id="btn" class="dropdown-item" href="/logout"
-                                   style="border: 1px solid grey; border-radius: 25px">Log Out</a>
+                                <a id="btn1" class="dropdown-item mb-2"
+                                   style="border: 1px solid #5700f7; border-radius: 25px"
+                                   th:attr="onclick=|location.href='/performance?username=${owner}&account'|">Account</a>
+                                <a id="btn2" class="dropdown-item"
+                                   style="border: 1px solid grey; border-radius: 25px"
+                                   href="/logout">Log Out</a>
                             </div>
                         </li>
                     </ul>
@@ -122,7 +136,8 @@
 
             <div class="row justify-content-center text-center">
                 <div class="col-11">
-                    <p class="h1 my-4">Performance Table</p>
+                    <p th:text="${owner}" class="h1" style="color: #5700f7"></p>
+                    <p class="h1">Performance Table</p>
                     <button type="button" class="first btn btn-secondary btn-lg"
                             th:if="${actions}"
                             th:attr="onclick=|location.href='/performance?username=${owner}&add=${owner}'|"
@@ -169,6 +184,8 @@
 <iframe th:if="${param.add}" th:attr="src=|@{/performance/add(username=${param.add[0]})}|"
         style="width: 100%; height: 100%; position: absolute; left:0; top:0; border: none"></iframe>
 <iframe th:if="${param.update}" th:attr="src=|@{/performance/update(id=${param.update[0]})}|"
+        style="width: 100%; height: 100%; position: absolute; left:0; top:0; border: none"></iframe>
+<iframe th:if="${param.account}" th:src="@{/account}"
         style="width: 100%; height: 100%; position: absolute; left:0; top:0; border: none"></iframe>
 
 </body>

@@ -6,7 +6,6 @@
 
 package ru.xpressed.performanceattendancecoursework.controller;
 
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +18,7 @@ import ru.xpressed.performanceattendancecoursework.enumerate.Role;
 import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
 import ru.xpressed.performanceattendancecoursework.security.SecurityConfiguration;
 import ru.xpressed.performanceattendancecoursework.service.EmailService;
+import ru.xpressed.performanceattendancecoursework.service.TokenService;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
@@ -33,6 +33,7 @@ import java.util.Optional;
  * @see Role
  * @see SecurityConfiguration#encoder()
  * @see EmailService
+ * @see TokenService
  */
 @Controller
 public class RegistrationController {
@@ -41,6 +42,8 @@ public class RegistrationController {
     private SecurityConfiguration securityConfiguration;
 
     private EmailService emailService;
+
+    private TokenService tokenService;
 
     @Autowired
     public void setSecurityConfiguration(SecurityConfiguration securityConfiguration) {
@@ -55,6 +58,11 @@ public class RegistrationController {
     @Autowired
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
+    }
+
+    @Autowired
+    public void setTokenService(TokenService tokenService) {
+        this.tokenService = tokenService;
     }
 
     /**
@@ -122,15 +130,7 @@ public class RegistrationController {
             user.setPassword(securityConfiguration.encoder().encode(user.getPassword()));
             user.setRoles(List.of(Role.ROLE_DEFAULT));
 
-            boolean isGenerated = false;
-            String generated = null;
-            while (!isGenerated) {
-                 generated = RandomString.make(32);
-                if (userRepository.findByToken(generated) == null) {
-                    isGenerated = true;
-                }
-            }
-            user.setToken(generated);
+            user.setToken(tokenService.generateNewToken());
 
             //Send verification message
             emailService.sendMessage(user.getUsername(), user.getToken());

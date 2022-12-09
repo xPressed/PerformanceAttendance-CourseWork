@@ -49,11 +49,11 @@ public class UsersController {
      * @return the template of page
      */
     @GetMapping("/users")
-    public String showUsersPage(Authentication authentication, Model model, @RequestParam("update") Optional<String> update, @RequestParam("view") Optional<String> view) {
+    public String showUsersPage(Authentication authentication, Model model, @RequestParam("update") Optional<String> update, @RequestParam("view") Optional<String> view, @RequestParam("account") Optional<String> account) {
         //Template building
         model.addAttribute("username", authentication.getName());
 
-        if (update.isPresent() || view.isPresent()) {
+        if (update.isPresent() || view.isPresent() || account.isPresent()) {
             model.addAttribute("overflow", "hidden");
             model.addAttribute("blur", "5px");
         } else {

@@ -67,7 +67,8 @@ public class AttendanceController {
                                  @RequestParam("username") String username,
                                  @RequestParam("add") Optional<String> add,
                                  @RequestParam("update") Optional<String> update,
-                                 @RequestParam("delete") Optional<Integer> id) {
+                                 @RequestParam("delete") Optional<Integer> id,
+                                 @RequestParam("account") Optional<String> account) {
         if (!Objects.equals(username, authentication.getName()) && authentication.getAuthorities().contains(Role.ROLE_STUDENT)) {
             return "redirect:/attendance?username=" + authentication.getName();
         }
@@ -86,15 +87,6 @@ public class AttendanceController {
             model.addAttribute("actions", true);
             model.addAttribute("owner", username);
 
-            //Check for update or add page
-            if (update.isPresent() || add.isPresent()) {
-                model.addAttribute("overflow", "hidden");
-                model.addAttribute("blur", "5px");
-            } else {
-                model.addAttribute("overflow", "visible");
-                model.addAttribute("blur", "0");
-            }
-
             //Check and deletion of attendance
             if (id.isPresent()) {
                 Attendance attendance = attendanceRepository.findById(id.orElse(null)).orElse(null);
@@ -106,6 +98,15 @@ public class AttendanceController {
 
                 attendanceRepository.deleteById(id.orElse(null));
             }
+        }
+
+        //Check for overflow page
+        if (update.isPresent() || add.isPresent() || account.isPresent()) {
+            model.addAttribute("overflow", "hidden");
+            model.addAttribute("blur", "5px");
+        } else {
+            model.addAttribute("overflow", "visible");
+            model.addAttribute("blur", "0");
         }
 
         //Table data

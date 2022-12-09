@@ -1,0 +1,60 @@
+<!--
+  ~ Copyright (c) 2002 - 2022. xPressed Inc.
+  ~ Maxim Zvyagincev.
+  ~ All rights not reserved.
+  -->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/mechfire" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Account</title>
+    <link rel="icon" th:href="@{/icons/leaf.png}" href="../static/icons/leaf.png">
+
+    <style>
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        #btn {
+            background-color: white;
+            color: #5700f7;
+        }
+
+        #btn:hover {
+            background-color: #5700f7;
+            color: white;
+        }
+    </style>
+
+</head>
+<body style="background-color: transparent;">
+<div style="z-index: 1; width: 100%; height: 100%; position: absolute; top: 0; right: 0"
+     onclick="parent.closeIFrame();"></div>
+<div class="mt-4 container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-10 col-xl-5" style="z-index: 2">
+            <div style="background-color: white; border-radius: 25px; border: 2px solid #5700f7">
+                <p class="text-center display-4" style="font-family: Mechfire,serif">Spring Table</p>
+
+
+                <div class="mx-5 px-5">
+                    <label class="h4">Your Personal Token</label>
+                    <label th:text="${token}" class="form-control input-lg">3rbGheq1fMlskbyaBIXzo4OGL4eDpJij</label>
+                </div>
+
+
+                <div class="d-flex justify-content-center m-3">
+                    <button id="btn" onclick="location.href='/account?new'" class="btn btn-secondary btn-lg"
+                            style="border-color: #5700f7; border-radius: 30px">Generate New
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
