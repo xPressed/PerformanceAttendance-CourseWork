@@ -8,13 +8,13 @@ package ru.xpressed.performanceattendancecoursework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.xpressed.performanceattendancecoursework.entity.Discipline;
+import ru.xpressed.performanceattendancecoursework.domain.Performance;
 
 /**
- * Discipline Repository is the JPA repository to work with database.
+ * Performance Repository is the JPA repository to work with database.
  *
- * @see Discipline
+ * @see Performance
  */
 @Repository
-public interface DisciplineRepository extends JpaRepository<Discipline, Integer> {
+public interface PerformanceRepository extends JpaRepository<Performance, Integer> {
 }

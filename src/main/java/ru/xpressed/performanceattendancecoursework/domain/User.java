@@ -4,7 +4,7 @@
  * All rights not reserved.
  */
 
-package ru.xpressed.performanceattendancecoursework.entity;
+package ru.xpressed.performanceattendancecoursework.domain;
 
 import lombok.*;
 import org.hibernate.annotations.Fetch;
@@ -28,7 +28,7 @@ import java.util.*;
  * @see ru.xpressed.performanceattendancecoursework.controller.UsersController
  * @see Role
  * @see Attendance
- * @see Discipline
+ * @see Performance
  * @see ru.xpressed.performanceattendancecoursework.security.SecurityUserDetailsService
  */
 @Entity
@@ -38,7 +38,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class User implements UserDetails {
     @Id
     @Email(regexp = "^[a-zA-Z\\.\\-\\_]*[@][a-zA-Z]*[\\.].[a-zA-Z]*", message = "E-Mail must be valid!")
@@ -81,7 +80,7 @@ public class User implements UserDetails {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
     @Fetch(value = FetchMode.SUBSELECT)
-    private List<Discipline> disciplines;
+    private List<Performance> performances;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
     @Fetch(value = FetchMode.SUBSELECT)

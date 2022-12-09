@@ -13,7 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.xpressed.performanceattendancecoursework.entity.User;
+import ru.xpressed.performanceattendancecoursework.domain.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
 import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
 import ru.xpressed.performanceattendancecoursework.security.SecurityConfiguration;

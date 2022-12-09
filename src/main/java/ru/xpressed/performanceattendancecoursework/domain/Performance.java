@@ -4,9 +4,10 @@
  * All rights not reserved.
  */
 
-package ru.xpressed.performanceattendancecoursework.entity;
+package ru.xpressed.performanceattendancecoursework.domain;
 
 import lombok.*;
+import ru.xpressed.performanceattendancecoursework.repository.PerformanceRepository;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -16,7 +17,7 @@ import javax.validation.constraints.Size;
 /**
  * Entity to store data of performance records.
  *
- * @see ru.xpressed.performanceattendancecoursework.repository.DisciplineRepository
+ * @see PerformanceRepository
  * @see ru.xpressed.performanceattendancecoursework.controller.PerformanceController
  * @see User
  */
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Discipline {
+public class Performance {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;

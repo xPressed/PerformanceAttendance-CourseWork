@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
-import ru.xpressed.performanceattendancecoursework.entity.Discipline;
-import ru.xpressed.performanceattendancecoursework.entity.User;
+import ru.xpressed.performanceattendancecoursework.domain.Performance;
+import ru.xpressed.performanceattendancecoursework.domain.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
-import ru.xpressed.performanceattendancecoursework.repository.DisciplineRepository;
+import ru.xpressed.performanceattendancecoursework.repository.PerformanceRepository;
 import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
 
 import javax.validation.Valid;
@@ -31,15 +31,15 @@ import java.util.Optional;
  *
  * @see UserRepository
  * @see User
- * @see DisciplineRepository
- * @see Discipline
+ * @see PerformanceRepository
+ * @see Performance
  * @see Role
  */
 @Controller
 public class PerformanceController {
     private UserRepository userRepository;
 
-    private DisciplineRepository disciplineRepository;
+    private PerformanceRepository performanceRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -47,8 +47,8 @@ public class PerformanceController {
     }
 
     @Autowired
-    public void setDisciplineRepository(DisciplineRepository disciplineRepository) {
-        this.disciplineRepository = disciplineRepository;
+    public void setPerformanceRepository(PerformanceRepository performanceRepository) {
+        this.performanceRepository = performanceRepository;
     }
 
     /**
@@ -105,15 +105,15 @@ public class PerformanceController {
             //Check for deletion
             if (id.isPresent()) {
                 //Delete foreign key from discipline
-                Discipline discipline = disciplineRepository.findById(id.orElse(null)).orElse(null);
-                if (discipline == null) {
+                Performance performance = performanceRepository.findById(id.orElse(null)).orElse(null);
+                if (performance == null) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                 }
-                discipline.setUser(null);
-                disciplineRepository.save(discipline);
+                performance.setUser(null);
+                performanceRepository.save(performance);
 
                 //Delete discipline
-                disciplineRepository.deleteById(id.orElse(null));
+                performanceRepository.deleteById(id.orElse(null));
             }
         }
 
@@ -127,7 +127,7 @@ public class PerformanceController {
         }
 
         //Table data
-        model.addAttribute("rows", Objects.requireNonNull(userRepository.findById(username).orElse(null)).getDisciplines());
+        model.addAttribute("rows", Objects.requireNonNull(userRepository.findById(username).orElse(null)).getPerformances());
         return "performance/main";
     }
 
@@ -140,7 +140,7 @@ public class PerformanceController {
      */
     @GetMapping("/performance/add")
     public String getAddPerformanceRecord(Model model, @RequestParam("username") String username) {
-        model.addAttribute("discipline", new Discipline());
+        model.addAttribute("performance", new Performance());
         return "performance/add";
     }
 
@@ -148,16 +148,16 @@ public class PerformanceController {
      * Method for POST REQUEST to validate and save new performance record.
      *
      * @param username       to choose user
-     * @param discipline     data to validate and save
+     * @param performance     data to validate and save
      * @param bindingResult  to validate
      * @param model          to return errors
      * @return the template or redirect
      */
     @PostMapping("/performance/add")
-    public String postAddPerformanceRecord(@RequestParam("username") String username, @Valid Discipline discipline,
+    public String postAddPerformanceRecord(@RequestParam("username") String username, @Valid Performance performance,
                                            BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("discipline", discipline);
+            model.addAttribute("performance", performance);
             return "performance/add";
         }
 
@@ -165,8 +165,8 @@ public class PerformanceController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        discipline.setUser(user);
-        user.getDisciplines().add(discipline);
+        performance.setUser(user);
+        user.getPerformances().add(performance);
         userRepository.save(user);
         return "performance/add";
     }
@@ -180,11 +180,11 @@ public class PerformanceController {
      */
     @GetMapping("/performance/update")
     public String getUpdatePerformanceRecord(@RequestParam("id") Integer id, Model model) {
-        Discipline discipline = disciplineRepository.findById(id).orElse(null);
-        if (discipline == null) {
+        Performance performance = performanceRepository.findById(id).orElse(null);
+        if (performance == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        model.addAttribute("discipline", discipline);
+        model.addAttribute("performance", performance);
         return "performance/update";
     }
 
@@ -192,23 +192,23 @@ public class PerformanceController {
      * Method for POST REQUEST to validate and save updated performance record.
      *
      * @param id             to choose the record
-     * @param newDiscipline  new updated data
+     * @param newPerformance  new updated data
      * @param bindingResult  to validate
      * @param model          to return errors
      * @return the template or redirect
      */
     @PostMapping("/performance/update")
-    public String postUpdatePerformanceRecord(@RequestParam("id") Integer id, @Valid Discipline newDiscipline, BindingResult bindingResult, Model model) {
+    public String postUpdatePerformanceRecord(@RequestParam("id") Integer id, @Valid Performance newPerformance, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("discipline", newDiscipline);
+            model.addAttribute("performance", newPerformance);
             return "performance/update";
         }
 
-        Discipline oldDiscipline = disciplineRepository.findById(id).orElse(null);
-        if (oldDiscipline == null) {
+        Performance oldPerformance = performanceRepository.findById(id).orElse(null);
+        if (oldPerformance == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        disciplineRepository.save(oldDiscipline.toBuilder().name(newDiscipline.getName()).mark(newDiscipline.getMark()).year(newDiscipline.getYear()).build());
+        performanceRepository.save(oldPerformance.toBuilder().name(newPerformance.getName()).mark(newPerformance.getMark()).year(newPerformance.getYear()).build());
         return "performance/update";
     }
 }

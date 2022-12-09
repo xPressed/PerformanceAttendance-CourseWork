@@ -8,7 +8,6 @@ package ru.xpressed.performanceattendancecoursework.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.RequestDispatcher;
@@ -24,7 +23,6 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
      * @return the name of the template
      */
     @RequestMapping("/error")
-    @ExceptionHandler(Exception.class)
     public String showErrorPage(HttpServletRequest request, Model model) {
         Object obj = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         //Check if request was forced and no error caught

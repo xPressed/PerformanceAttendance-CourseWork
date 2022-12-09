@@ -8,7 +8,7 @@ package ru.xpressed.performanceattendancecoursework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.xpressed.performanceattendancecoursework.entity.Attendance;
+import ru.xpressed.performanceattendancecoursework.domain.Attendance;
 
 /**
  * Attendance Repository is the JPA repository to work with database.

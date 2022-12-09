@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                 .antMatchers("/attendance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
                 .antMatchers("/attendance/**").hasAnyRole("TEACHER", "ADMIN")
 
+                .antMatchers("/api/**").permitAll()
+
                 .anyRequest().hasAnyRole("STUDENT", "TEACHER", "ADMIN")
 
                 .and()
