@@ -27,15 +27,10 @@ public class SecurityConfiguration {
                 .authorizeRequests()
                 .antMatchers("/registration", "/error", "/icons/**", "/logout").permitAll()
 
-                .antMatchers("/users").hasAnyRole("TEACHER", "ADMIN")
-                .antMatchers("/users/**").hasAnyRole("TEACHER", "ADMIN")
+                .antMatchers("/performance", "/attendance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
+
+                .antMatchers("/users", "/users/**", "/performance/**", "/attendance/**", "/docs", "/swagger").hasAnyRole("TEACHER", "ADMIN")
                 .antMatchers("/users/delete").hasRole("ADMIN")
-
-                .antMatchers("/performance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
-                .antMatchers("/performance/**").hasAnyRole("TEACHER", "ADMIN")
-
-                .antMatchers("/attendance").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
-                .antMatchers("/attendance/**").hasAnyRole("TEACHER", "ADMIN")
 
                 .antMatchers("/api/**").permitAll()
 
