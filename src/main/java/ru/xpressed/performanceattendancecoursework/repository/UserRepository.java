@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import ru.xpressed.performanceattendancecoursework.domain.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User Repository is the JPA repository to work with database.
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-    User findByToken(String token);
+    Optional<User> findByToken(String token);
 
     @Query(value = "SELECT * FROM public.user WHERE (:surname is null or surname = :surname) AND" +
             "(:name is null or name = :name) AND" +

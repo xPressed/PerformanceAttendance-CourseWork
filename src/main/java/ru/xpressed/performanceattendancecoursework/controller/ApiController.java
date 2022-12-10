@@ -31,6 +31,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Rest Controller to provide API to permitted users.
+ *
+ * @see UserRepository
+ * @see User
+ * @see UserDTO
+ *
+ * @see PerformanceRepository
+ * @see Performance
+ * @see PerformanceDTO
+ *
+ * @see AttendanceRepository
+ * @see Attendance
+ * @see AttendanceDTO
+ *
+ * @see RequesterService
+ * @see ExceptionDTO
+ */
 @RestController
 @RequestMapping("/api")
 public class ApiController {
@@ -39,11 +57,23 @@ public class ApiController {
     private AttendanceRepository attendanceRepository;
     private RequesterService requesterService;
 
+    /**
+     * Exception Handler to handle Response Status Exceptions.
+     *
+     * @param e Response Status Exception
+     * @return ExceptionDTO with code and reason
+     */
     @ExceptionHandler(ResponseStatusException.class)
     public ExceptionDTO restError(ResponseStatusException e) {
         return new ExceptionDTO(e.getRawStatusCode(), e.getMessage());
     }
 
+    /**
+     * Exception Handler to handle Missing Request Parameter Exceptions.
+     *
+     * @param e Missing Request Parameter Exception
+     * @return ExceptionDTO with code and reason
+     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ExceptionDTO paramError(MissingServletRequestParameterException e) {
         return new ExceptionDTO(400, e.getMessage());
@@ -69,6 +99,13 @@ public class ApiController {
         this.requesterService = requesterService;
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted User data.
+     *
+     * @param username is the id of user
+     * @param token to check for permission
+     * @return UserDTO
+     */
     @Operation(summary = "GET User by ID")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class)))
@@ -80,6 +117,16 @@ public class ApiController {
         return new UserDTO(user.getUsername(), user.getRoles().get(0), user.getSurname(), user.getName(), user.getPatronymic(), user.getGroupName());
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted list of User data.
+     *
+     * @param token to check for permission
+     * @param surname optional param
+     * @param name optional param
+     * @param patronymic optional param
+     * @param groupName optional param
+     * @return list of UserDTO
+     */
     @Operation(summary = "GET Users by Params")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class)))
@@ -99,6 +146,13 @@ public class ApiController {
         return userDTOList;
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted Performance data.
+     *
+     * @param id of performance record
+     * @param token to check for permission
+     * @return PerformanceDTO
+     */
     @Operation(summary = "GET Performance by ID")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = PerformanceDTO.class)))
@@ -110,6 +164,16 @@ public class ApiController {
         return new PerformanceDTO(performance.getName(), performance.getMark(), performance.getYear(), performance.getUser().getUsername());
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted list of Performance data.
+     *
+     * @param token to check for permission
+     * @param name optional param
+     * @param mark optional param
+     * @param year optional param
+     * @param username optional param
+     * @return list of PerformanceDTO
+     */
     @Operation(summary = "GET Performances by Params")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = PerformanceDTO.class)))
@@ -128,6 +192,13 @@ public class ApiController {
         return performanceDTOList;
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted Attendance data.
+     *
+     * @param id of attendance record
+     * @param token to check for permission
+     * @return AttendanceDTO
+     */
     @Operation(summary = "GET Attendance by ID")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = AttendanceDTO.class)))
@@ -139,6 +210,16 @@ public class ApiController {
         return new AttendanceDTO(attendance.getDate(), attendance.getEnterTime(), attendance.getExitTime(), attendance.getUser().getUsername());
     }
 
+    /**
+     * Method for REST GET REQUEST to get JSON formatted list of Attendance data.
+     *
+     * @param token to check for permission
+     * @param date optional param
+     * @param enterTime optional param
+     * @param exitTime optional param
+     * @param username optional param
+     * @return list of AttendanceDTO
+     */
     @Operation(summary = "GET Attendances by Params")
     @ApiResponse(responseCode = "200", description = "API is working",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = AttendanceDTO.class)))

@@ -30,7 +30,7 @@ public class TokenService {
         String generated = null;
         while (!isGenerated) {
             generated = RandomString.make(32);
-            if (userRepository.findByToken(generated) == null) {
+            if (userRepository.findByToken(generated).orElse(null) == null) {
                 isGenerated = true;
             }
         }

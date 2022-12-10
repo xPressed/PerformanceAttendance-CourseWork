@@ -76,7 +76,7 @@ public class RegistrationController {
     public String showRegistrationForm(Model model, @RequestParam("token") Optional<String> token) {
         //Check for token and update user if token found in database
         if (token.isPresent()) {
-            User user = userRepository.findByToken(token.orElse(null));
+            User user = userRepository.findByToken(token.orElse(null)).orElse(null);
             user.setRoles(List.of(Role.ROLE_STUDENT));
             userRepository.save(user);
             return "redirect:/login";

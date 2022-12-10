@@ -14,6 +14,13 @@ import ru.xpressed.performanceattendancecoursework.domain.User;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;
 import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
 
+/**
+ * Requester Service to check for API requesters' permissions.
+ *
+ * @see UserRepository
+ * @see ru.xpressed.performanceattendancecoursework.controller.ApiController
+ * @see Role
+ */
 @Service
 public class RequesterService {
     private UserRepository userRepository;
@@ -24,10 +31,7 @@ public class RequesterService {
     }
 
     public void checkRequester(String token) {
-        User requester = userRepository.findByToken(token);
-        if (requester == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User requester = userRepository.findByToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         if (!(requester.getRoles().contains(Role.ROLE_TEACHER) || requester.getRoles().contains(Role.ROLE_ADMIN))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
