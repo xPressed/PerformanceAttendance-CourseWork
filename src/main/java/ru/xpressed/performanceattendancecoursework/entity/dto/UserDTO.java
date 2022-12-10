@@ -4,7 +4,7 @@
  * All rights not reserved.
  */
 
-package ru.xpressed.performanceattendancecoursework.domain.dto;
+package ru.xpressed.performanceattendancecoursework.entity.dto;
 
 import lombok.*;
 import ru.xpressed.performanceattendancecoursework.enumerate.Role;

@@ -4,7 +4,7 @@
  * All rights not reserved.
  */
 
-package ru.xpressed.performanceattendancecoursework.domain;
+package ru.xpressed.performanceattendancecoursework.entity;
 
 import lombok.*;
 

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.xpressed.performanceattendancecoursework.domain.Performance;
+import ru.xpressed.performanceattendancecoursework.entity.Performance;
 
 import java.util.List;
 
