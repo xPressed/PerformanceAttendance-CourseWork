@@ -89,10 +89,8 @@ public class AttendanceController {
 
             //Check and deletion of attendance
             if (id.isPresent()) {
-                Attendance attendance = attendanceRepository.findById(id.orElse(null)).orElse(null);
-                if (attendance == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                }
+                Attendance attendance = attendanceRepository.findById(id.orElse(null)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+
                 attendance.setUser(null);
                 attendanceRepository.save(attendance);
 
@@ -145,10 +143,7 @@ public class AttendanceController {
             return "attendance/add";
         }
 
-        User user = userRepository.findById(username).orElse(null);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User user = userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         attendance.setUser(user);
 
         //Add new attendance record to user
@@ -167,10 +162,7 @@ public class AttendanceController {
      */
     @GetMapping("/attendance/update")
     public String getUpdateAttendanceRecord(@RequestParam("id") Integer id, Model model) {
-        Attendance attendance = attendanceRepository.findById(id).orElse(null);
-        if (attendance == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        Attendance attendance = attendanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         model.addAttribute("attendance", attendance);
         return "attendance/update";
     }
@@ -194,10 +186,7 @@ public class AttendanceController {
         }
 
         //Build attendance with new data from new
-        Attendance oldAttendance = attendanceRepository.findById(id).orElse(null);
-        if (oldAttendance == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        Attendance oldAttendance = attendanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         attendanceRepository.save(oldAttendance.toBuilder().date(newAttendance.getDate()).enterTime(newAttendance.getEnterTime()).exitTime(newAttendance.getExitTime()).build());
         return "attendance/update";
     }

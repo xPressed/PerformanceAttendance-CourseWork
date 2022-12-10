@@ -105,10 +105,8 @@ public class PerformanceController {
             //Check for deletion
             if (id.isPresent()) {
                 //Delete foreign key from discipline
-                Performance performance = performanceRepository.findById(id.orElse(null)).orElse(null);
-                if (performance == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                }
+                Performance performance = performanceRepository.findById(id.orElse(null)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+
                 performance.setUser(null);
                 performanceRepository.save(performance);
 
@@ -161,10 +159,7 @@ public class PerformanceController {
             return "performance/add";
         }
 
-        User user = userRepository.findById(username).orElse(null);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User user = userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         performance.setUser(user);
         user.getPerformances().add(performance);
         userRepository.save(user);
@@ -180,10 +175,7 @@ public class PerformanceController {
      */
     @GetMapping("/performance/update")
     public String getUpdatePerformanceRecord(@RequestParam("id") Integer id, Model model) {
-        Performance performance = performanceRepository.findById(id).orElse(null);
-        if (performance == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        Performance performance = performanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         model.addAttribute("performance", performance);
         return "performance/update";
     }
@@ -204,10 +196,7 @@ public class PerformanceController {
             return "performance/update";
         }
 
-        Performance oldPerformance = performanceRepository.findById(id).orElse(null);
-        if (oldPerformance == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        Performance oldPerformance = performanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         performanceRepository.save(oldPerformance.toBuilder().name(newPerformance.getName()).mark(newPerformance.getMark()).year(newPerformance.getYear()).build());
         return "performance/update";
     }

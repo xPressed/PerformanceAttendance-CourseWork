@@ -88,10 +88,7 @@ public class UsersController {
             model.addAttribute("roleUpdate", false);
         }
 
-        User user = userRepository.findById(username).orElse(null);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User user = userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         model.addAttribute("user", user);
         return "users/update";
     }
@@ -120,10 +117,7 @@ public class UsersController {
         }
 
         //Update old user with the data of new one
-        User oldUser = userRepository.findById(username).orElse(null);
-        if (oldUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User oldUser = userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         userRepository.save(oldUser.toBuilder().surname(newUser.getSurname()).name(newUser.getName()).patronymic(newUser.getPatronymic()).groupName(newUser.getGroupName()).roles(newUser.getRoles()).build());
         return "users/update";
     }
@@ -137,10 +131,7 @@ public class UsersController {
      */
     @GetMapping("/users/view")
     public String getViewUser(@RequestParam("username") String username, Model model) {
-        User user =  userRepository.findById(username).orElse(null);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        User user =  userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         model.addAttribute("user", user);
         return "users/view";
     }
