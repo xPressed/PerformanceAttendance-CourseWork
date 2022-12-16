@@ -10,52 +10,33 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.xpressed.performanceattendancecoursework.entity.Attendance;
-import ru.xpressed.performanceattendancecoursework.entity.Performance;
-import ru.xpressed.performanceattendancecoursework.entity.User;
 import ru.xpressed.performanceattendancecoursework.entity.dto.AttendanceDTO;
 import ru.xpressed.performanceattendancecoursework.entity.dto.ExceptionDTO;
 import ru.xpressed.performanceattendancecoursework.entity.dto.PerformanceDTO;
 import ru.xpressed.performanceattendancecoursework.entity.dto.UserDTO;
-import ru.xpressed.performanceattendancecoursework.repository.AttendanceRepository;
-import ru.xpressed.performanceattendancecoursework.repository.PerformanceRepository;
-import ru.xpressed.performanceattendancecoursework.repository.UserRepository;
-import ru.xpressed.performanceattendancecoursework.service.RequesterService;
+import ru.xpressed.performanceattendancecoursework.service.ApiService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Rest Controller to provide API to permitted users.
  *
- * @see UserRepository
- * @see User
+ * @see ApiService
  * @see UserDTO
- *
- * @see PerformanceRepository
- * @see Performance
  * @see PerformanceDTO
- *
- * @see AttendanceRepository
- * @see Attendance
  * @see AttendanceDTO
- *
- * @see RequesterService
  * @see ExceptionDTO
  */
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ApiController {
-    private UserRepository userRepository;
-    private PerformanceRepository performanceRepository;
-    private AttendanceRepository attendanceRepository;
-    private RequesterService requesterService;
+    private final ApiService apiService;
 
     /**
      * Exception Handler to handle Response Status Exceptions.
@@ -79,31 +60,11 @@ public class ApiController {
         return new ExceptionDTO(400, e.getMessage());
     }
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setPerformanceRepository(PerformanceRepository performanceRepository) {
-        this.performanceRepository = performanceRepository;
-    }
-
-    @Autowired
-    public void setAttendanceRepository(AttendanceRepository attendanceRepository) {
-        this.attendanceRepository = attendanceRepository;
-    }
-
-    @Autowired
-    public void setRequesterService(RequesterService requesterService) {
-        this.requesterService = requesterService;
-    }
-
     /**
      * Method for REST GET REQUEST to get JSON formatted User data.
      *
      * @param username is the id of user
-     * @param token to check for permission
+     * @param token    to check for permission
      * @return UserDTO
      */
     @Operation(summary = "GET User by ID")
@@ -112,19 +73,17 @@ public class ApiController {
     @GetMapping("/user")
     public UserDTO getUserById(@RequestParam("username") String username,
                                @RequestParam("token") String token) {
-        requesterService.checkRequester(token);
-        User user = userRepository.findById(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-        return new UserDTO(user.getUsername(), user.getRoles().get(0), user.getSurname(), user.getName(), user.getPatronymic(), user.getGroupName());
+        return apiService.getUserById(username, token);
     }
 
     /**
      * Method for REST GET REQUEST to get JSON formatted list of User data.
      *
-     * @param token to check for permission
-     * @param surname optional param
-     * @param name optional param
+     * @param token      to check for permission
+     * @param surname    optional param
+     * @param name       optional param
      * @param patronymic optional param
-     * @param groupName optional param
+     * @param groupName  optional param
      * @return list of UserDTO
      */
     @Operation(summary = "GET Users by Params")
@@ -136,20 +95,14 @@ public class ApiController {
                                   @RequestParam("name") Optional<String> name,
                                   @RequestParam("patronymic") Optional<String> patronymic,
                                   @RequestParam("groupName") Optional<String> groupName) {
-        requesterService.checkRequester(token);
-
-        List<User> userList = userRepository.findByParams(surname.orElse(null), name.orElse(null), patronymic.orElse(null), groupName.orElse(null));
-        List<UserDTO> userDTOList = new ArrayList<>();
-        for (User user : userList) {
-            userDTOList.add(new UserDTO(user.getUsername(), user.getRoles().get(0), user.getSurname(), user.getName(), user.getPatronymic(), user.getGroupName()));
-        }
-        return userDTOList;
+        return apiService.getUsers(token, surname.orElse(null), name.orElse(null),
+                patronymic.orElse(null), groupName.orElse(null));
     }
 
     /**
      * Method for REST GET REQUEST to get JSON formatted Performance data.
      *
-     * @param id of performance record
+     * @param id    of performance record
      * @param token to check for permission
      * @return PerformanceDTO
      */
@@ -159,18 +112,16 @@ public class ApiController {
     @GetMapping("/performance")
     public PerformanceDTO getPerformanceById(@RequestParam("id") Integer id,
                                              @RequestParam("token") String token) {
-        requesterService.checkRequester(token);
-        Performance performance = performanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-        return new PerformanceDTO(performance.getName(), performance.getMark(), performance.getYear(), performance.getUser().getUsername());
+        return apiService.getPerformanceById(id, token);
     }
 
     /**
      * Method for REST GET REQUEST to get JSON formatted list of Performance data.
      *
-     * @param token to check for permission
-     * @param name optional param
-     * @param mark optional param
-     * @param year optional param
+     * @param token    to check for permission
+     * @param name     optional param
+     * @param mark     optional param
+     * @param year     optional param
      * @param username optional param
      * @return list of PerformanceDTO
      */
@@ -183,19 +134,14 @@ public class ApiController {
                                                 @RequestParam("mark") Optional<String> mark,
                                                 @RequestParam("year") Optional<String> year,
                                                 @RequestParam("username") Optional<String> username) {
-        requesterService.checkRequester(token);
-        List<Performance> performanceList = performanceRepository.findByParams(name.orElse(null), mark.orElse(null), year.orElse(null), username.orElse(null));
-        List<PerformanceDTO> performanceDTOList = new ArrayList<>();
-        for (Performance performance : performanceList) {
-            performanceDTOList.add(new PerformanceDTO(performance.getName(), performance.getMark(), performance.getYear(), performance.getUser().getUsername()));
-        }
-        return performanceDTOList;
+        return apiService.getPerformances(token, name.orElse(null), mark.orElse(null),
+                year.orElse(null), username.orElse(null));
     }
 
     /**
      * Method for REST GET REQUEST to get JSON formatted Attendance data.
      *
-     * @param id of attendance record
+     * @param id    of attendance record
      * @param token to check for permission
      * @return AttendanceDTO
      */
@@ -205,19 +151,17 @@ public class ApiController {
     @GetMapping("/attendance")
     public AttendanceDTO getAttendanceById(@RequestParam("id") Integer id,
                                            @RequestParam("token") String token) {
-        requesterService.checkRequester(token);
-        Attendance attendance = attendanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-        return new AttendanceDTO(attendance.getDate(), attendance.getEnterTime(), attendance.getExitTime(), attendance.getUser().getUsername());
+        return apiService.getAttendanceById(id, token);
     }
 
     /**
      * Method for REST GET REQUEST to get JSON formatted list of Attendance data.
      *
-     * @param token to check for permission
-     * @param date optional param
+     * @param token     to check for permission
+     * @param date      optional param
      * @param enterTime optional param
-     * @param exitTime optional param
-     * @param username optional param
+     * @param exitTime  optional param
+     * @param username  optional param
      * @return list of AttendanceDTO
      */
     @Operation(summary = "GET Attendances by Params")
@@ -229,12 +173,7 @@ public class ApiController {
                                               @RequestParam("enterTime") Optional<String> enterTime,
                                               @RequestParam("exitTime") Optional<String> exitTime,
                                               @RequestParam("username") Optional<String> username) {
-        requesterService.checkRequester(token);
-        List<Attendance> attendanceList = attendanceRepository.findByParams(date.orElse(null), enterTime.orElse(null), exitTime.orElse(null), username.orElse(null));
-        List<AttendanceDTO> attendanceDTOList = new ArrayList<>();
-        for (Attendance attendance : attendanceList) {
-            attendanceDTOList.add(new AttendanceDTO(attendance.getDate(), attendance.getEnterTime(), attendance.getExitTime(), attendance.getUser().getUsername()));
-        }
-        return attendanceDTOList;
+        return apiService.getAttendances(token, date.orElse(null), enterTime.orElse(null),
+                exitTime.orElse(null), username.orElse(null));
     }
 }

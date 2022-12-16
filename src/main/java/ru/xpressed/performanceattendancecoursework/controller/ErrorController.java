@@ -6,17 +6,26 @@
 
 package ru.xpressed.performanceattendancecoursework.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.xpressed.performanceattendancecoursework.service.ErrorService;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Controller is showing the Error Page from templates with specific HTTP request status code transferred to HTML by Thymeleaf.
+ *
+ * @see ErrorService
+ */
 @Controller
+@RequiredArgsConstructor
 public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
+    private final ErrorService errorService;
+
     /**
-     * Controller is showing the Error Page from templates with specific HTTP request status code transferred to HTML by Thymeleaf.
+     * Request Mapping to show Error Page.
      *
      * @param request is used to extract the HTTP request status code
      * @param model   is used to interact with template model
@@ -24,19 +33,6 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
      */
     @RequestMapping("/error")
     public String showErrorPage(HttpServletRequest request, Model model) {
-        Object obj = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        //Check if request was forced and no error caught
-        if (obj != null) {
-            //Custom error page build for 403 error
-            if (obj.equals(403)) {
-                model.addAttribute("code", "Status code: " + obj + " Access denied!");
-            } else {
-                model.addAttribute("code", "Status code: " + obj);
-            }
-        } else {
-            model.addAttribute("code", "Status code: Forced call!");
-        }
-
-        return "error";
+        return errorService.showErrorPage(request, model);
     }
 }
